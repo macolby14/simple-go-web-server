@@ -3,7 +3,14 @@ package main
 import (
 	"fmt"
 	"net/http"
+
+	"github.com/gorilla/pat"
 )
+
+func home(w http.ResponseWriter, req *http.Request) {
+	w.WriteHeader(http.StatusOK)
+	fmt.Fprintf(w, "Home Page")
+}
 
 
 func hello(w http.ResponseWriter, req *http.Request){
@@ -19,8 +26,15 @@ func headers(w http.ResponseWriter, req *http.Request){
 }
 
 func main() {
+	router := pat.New()
+	
 	http.HandleFunc("/hello", hello)
 	http.HandleFunc("/headers", headers)
 
-	http.ListenAndServe(":8090", nil)
+	router.Get("/", home)
+
+	http.Handle("/", router)
+
+	fmt.Println("Starting webserver...")
+	http.ListenAndServe(":8080", nil)
 }
