@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/gorilla/pat"
 	"github.com/joho/godotenv"
@@ -30,7 +31,7 @@ func main() {
 		log.Fatal("Errir loading .env file")
 	}
 
-	goth.UseProviders(google.New("clientKey", "secret", "http://localhost:8080/auth/google/callback"))
+	goth.UseProviders(google.New(os.Getenv("GOOGLE_OAUTH_CLIENT_ID"), os.Getenv("GOOGLE_OAUTH_SECRET"), "http://localhost:8080/auth/google/callback"))
 
 	router := pat.New()
 	router.Get("/auth/{provider}", auth)
