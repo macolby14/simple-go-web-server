@@ -18,7 +18,6 @@ func auth(res http.ResponseWriter, req *http.Request) {
 	if user, err := gothic.CompleteUserAuth(res, req); err == nil {
 		fmt.Fprintf(res, "Auth already complete %v %v", res, user)
 	} else {
-		fmt.Println("Beginning auth")
 		gothic.BeginAuthHandler(res, req)
 	}
 }
@@ -32,7 +31,7 @@ func authCallback(res http.ResponseWriter, req *http.Request) {
 	fmt.Fprintf(res, "User info %v", user)
 }
 
-func logout(res http.ResponseWriter, req *http.Request) {
+func authLogout(res http.ResponseWriter, req *http.Request) {
 	gothic.Logout(res, req)
 	res.Header().Set("Location", "/")
 	res.WriteHeader(http.StatusTemporaryRedirect)
@@ -54,7 +53,7 @@ func main() {
 
 	router := pat.New()
 	router.Get("/auth/{provider}/callback", authCallback)
-	router.Get("/auth/{provider}/logout", logout)
+	router.Get("/auth/{provider}/logout", authLogout)
 	router.Get("/auth/{provider}", auth)
 	router.Get("/", home)
 	http.Handle("/", router)
