@@ -5,6 +5,9 @@ import (
 	"net/http"
 
 	"github.com/gorilla/pat"
+	"github.com/markbates/goth"
+	"github.com/markbates/goth/gothic"
+	"github.com/markbates/goth/providers/google"
 )
 
 func home(w http.ResponseWriter, req *http.Request) {
