@@ -34,6 +34,7 @@ func authCallback(res http.ResponseWriter, req *http.Request) {
 	}
 	session, _ := store.Get(req, "app-session")
 	session.Values["user"] = user
+	session.Values["test"] = 1
 	session.Save(req, res)
 	fmt.Fprintf(res, "User info %v", user)
 }
