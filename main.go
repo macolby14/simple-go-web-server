@@ -2,9 +2,11 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 
 	"github.com/gorilla/pat"
+	"github.com/joho/godotenv"
 	"github.com/markbates/goth"
 	"github.com/markbates/goth/gothic"
 	"github.com/markbates/goth/providers/google"
@@ -24,6 +26,10 @@ func home(res http.ResponseWriter, req *http.Request) {
 }
 
 func main() {
+	if err := godotenv.Load(); err != nil {
+		log.Fatal("Errir loading .env file")
+	}
+
 	goth.UseProviders(google.New("clientKey", "secret", "http://localhost:8080/auth/google/callback"))
 
 	router := pat.New()
