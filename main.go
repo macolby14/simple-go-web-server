@@ -10,14 +10,24 @@ import (
 	"github.com/markbates/goth/providers/google"
 )
 
-func home(w http.ResponseWriter, req *http.Request) {
-	w.WriteHeader(http.StatusOK)
-	fmt.Fprintf(w, "Home Page")
+func auth(res http.ResponseWriter, req *http.Request) {
+	if user, err := gothic.CompleteUserAuth(res, req); err == nil {
+		fmt.Fprintf(res, "Auth a success %v %v", res, user)
+	} else {
+		gothic.BeginAuthHandler(res, req)
+	}
 }
 
+func home(res http.ResponseWriter, req *http.Request) {
+	res.WriteHeader(http.StatusOK)
+	fmt.Fprintf(res, "Home Page")
+}
 
 func main() {
+	goth.UseProviders(google.New("clientKey", "secret", "http://localhost:8080/auth/google/callback"))
+
 	router := pat.New()
+	router.Get("/auth/{provider}", auth)
 	router.Get("/", home)
 	http.Handle("/", router)
 
