@@ -15,12 +15,28 @@ import (
 	"github.com/markbates/goth/providers/google"
 )
 
+type User struct {
+	Provider  string
+	Email     string
+	Name      string
+	AvatarURL string
+}
+
+func createSession(user goth.User, res http.ResponseWriter, req *http.Request) {
+	session, err := store.Get(req, "app-session")
+	if err != nil {
+		log.Printf("[ERROR] getting a session: %v\n", err)
+		return
+	}
+	session.Values["user"] = User{Provider: user.Provider, Email: user.Email, Name: user.Name, AvatarURL: user.AvatarURL}
+	session.Save(req, res)
+	res.Header().Set("Location", "/")
+	res.WriteHeader(http.StatusTemporaryRedirect)
+}
+
 func auth(res http.ResponseWriter, req *http.Request) {
 	if user, err := gothic.CompleteUserAuth(res, req); err == nil {
-		session, _ := store.Get(req, "app-session")
-		session.Values["user"] = user
-		session.Save(req, res)
-		fmt.Fprintf(res, "Auth already complete %v %v", res, user)
+		createSession(user, res, req)
 	} else {
 		gothic.BeginAuthHandler(res, req)
 	}
@@ -32,11 +48,9 @@ func authCallback(res http.ResponseWriter, req *http.Request) {
 		fmt.Fprintln(res, err)
 		return
 	}
-	session, _ := store.Get(req, "app-session")
-	session.Values["user"] = user
-	session.Values["test"] = 1
-	session.Save(req, res)
-	fmt.Fprintf(res, "User info %v", user)
+	createSession(user, res, req)
+	res.Header().Set("Location", "/")
+	res.WriteHeader(http.StatusTemporaryRedirect)
 }
 
 func authLogout(res http.ResponseWriter, req *http.Request) {
