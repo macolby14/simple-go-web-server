@@ -56,7 +56,7 @@ var store *sessions.CookieStore
 
 func main() {
 	if err := godotenv.Load(); err != nil {
-		log.Fatal("Errir loading .env file")
+		log.Fatal("Error loading .env file")
 	}
 
 	store = sessions.NewCookieStore([]byte(os.Getenv("APP_SESSION_SECRET")))
