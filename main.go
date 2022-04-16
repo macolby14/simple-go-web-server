@@ -54,6 +54,7 @@ func main() {
 
 	router := pat.New()
 	router.Get("/auth/{provider}/callback", authCallback)
+	router.Get("/auth/{provider}/logout", logout)
 	router.Get("/auth/{provider}", auth)
 	router.Get("/", home)
 	http.Handle("/", router)
