@@ -29,9 +29,9 @@ func createSession(user goth.User, res http.ResponseWriter, req *http.Request) {
 		log.Printf("[ERROR] getting a session: %v\n", err)
 		return
 	}
-	session.Values["user"] = User{Provider: user.Provider, Email: user.Email, Name: user.Name, AvatarURL: user.AvatarURL}
+	session.Values["user"] = user
 	fmt.Println(session.Values["user"])
-	if session.Save(req, res); err != nil {
+	if err = session.Save(req, res); err != nil {
 		fmt.Fprintln(res, "Could not save session", err)
 	}
 	// res.WriteHeader(http.StatusOK)
