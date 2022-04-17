@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -58,12 +59,17 @@ func authLogout(res http.ResponseWriter, req *http.Request) {
 	res.WriteHeader(http.StatusTemporaryRedirect)
 }
 
-func home(res http.ResponseWriter, req *http.Request) {
-	session, _ := store.Get(req, "app-session")
-	username, _ := session.Values["user"]
+func authHealth(res http.ResponseWriter, req *http.Request) {
+	// session, _ := store.Get(req, "app-session")
+	// user, _ := session.Values["user"]
 
 	res.WriteHeader(http.StatusOK)
-	fmt.Fprintf(res, "Home Page. Username is %v", username)
+	json.NewEncoder(res).Encode(map[string]bool{"ok": true})
+}
+
+func health(res http.ResponseWriter, req *http.Request) {
+	res.WriteHeader(http.StatusOK)
+	json.NewEncoder(res).Encode(map[string]bool{"ok": true})
 }
 
 var store *sessions.CookieStore
@@ -81,10 +87,11 @@ func main() {
 	goth.UseProviders(google.New(os.Getenv("GOOGLE_OAUTH_CLIENT_ID"), os.Getenv("GOOGLE_OAUTH_SECRET"), "http://localhost:8080/auth/google/callback"))
 
 	router := pat.New()
+	router.Get("/auth/health", authHealth)
 	router.Get("/auth/{provider}/callback", authCallback)
 	router.Get("/auth/{provider}/logout", authLogout)
 	router.Get("/auth/{provider}", auth)
-	router.Get("/", home)
+	router.Get("/api/health", health)
 	http.Handle("/", router)
 
 	fmt.Println("Starting webserver...")
