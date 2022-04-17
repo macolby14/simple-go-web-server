@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/gob"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -28,14 +29,13 @@ func createSession(user goth.User, res http.ResponseWriter, req *http.Request) {
 		log.Printf("[ERROR] getting a session: %v\n", err)
 		return
 	}
-	appUser := User{Provider: user.Provider, Email: user.Email, AvatarURL: user.AvatarURL}
-	session.Values["user"] = appUser
+	session.Values["user"] = User{Provider: user.Provider, Email: user.Email, AvatarURL: user.AvatarURL}
 	fmt.Println(session.Values["user"])
 	if err = session.Save(req, res); err != nil {
 		fmt.Fprintln(res, "Could not save session", err)
 	}
-	// res.WriteHeader(http.StatusOK)
-	// fmt.Fprintln(res, "Logged in successfully")
+	res.WriteHeader(http.StatusOK)
+	fmt.Fprintln(res, "Logged in successfully")
 }
 
 func auth(res http.ResponseWriter, req *http.Request) {
@@ -86,6 +86,8 @@ func main() {
 	if err := godotenv.Load(); err != nil {
 		log.Fatal("Error loading .env file")
 	}
+
+	gob.Register(User{})
 
 	store = sessions.NewCookieStore([]byte(os.Getenv("APP_SESSION_SECRET")))
 
