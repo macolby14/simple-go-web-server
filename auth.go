@@ -43,8 +43,8 @@ func createSession(user goth.User, res http.ResponseWriter, req *http.Request) {
 	if err = session.Save(req, res); err != nil {
 		fmt.Fprintln(res, "Could not save session", err)
 	}
-	res.WriteHeader(http.StatusOK)
-	fmt.Fprintln(res, "Logged in successfully")
+	res.Header().Set("Location", "/api/auth/user")
+	res.WriteHeader(http.StatusTemporaryRedirect)
 }
 
 func auth(res http.ResponseWriter, req *http.Request) {
