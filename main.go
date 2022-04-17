@@ -19,7 +19,6 @@ import (
 type User struct {
 	Provider  string
 	Email     string
-	Name      string
 	AvatarURL string
 }
 
@@ -29,7 +28,8 @@ func createSession(user goth.User, res http.ResponseWriter, req *http.Request) {
 		log.Printf("[ERROR] getting a session: %v\n", err)
 		return
 	}
-	session.Values["user"] = user
+	appUser := User{Provider: user.Provider, Email: user.Email, AvatarURL: user.AvatarURL}
+	session.Values["user"] = appUser
 	fmt.Println(session.Values["user"])
 	if err = session.Save(req, res); err != nil {
 		fmt.Fprintln(res, "Could not save session", err)
@@ -92,7 +92,7 @@ func main() {
 	/* This is just used for gothic state */
 	os.Setenv("SESSION_SECRET", string(securecookie.GenerateRandomKey(32)))
 
-	goth.UseProviders(google.New(os.Getenv("GOOGLE_OAUTH_CLIENT_ID"), os.Getenv("GOOGLE_OAUTH_SECRET"), "http://localhost:8080/auth/google/callback"))
+	goth.UseProviders(google.New(os.Getenv("GOOGLE_OAUTH_CLIENT_ID"), os.Getenv("GOOGLE_OAUTH_SECRET"), "http://localhost:8080/api/auth/google/callback"))
 
 	router := pat.New()
 	router.Get("/api/auth/user", authUser)
