@@ -1,0 +1,10 @@
+{
+    "watch": ["./**/*.go"],
+    "verbose": true,
+    "execMap": {
+        "go": "go run"
+    },
+    "exec": "go run *.go",
+    "ext": "go",
+    "signal": "SIGTERM"
+}
