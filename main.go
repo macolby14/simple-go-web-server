@@ -62,7 +62,7 @@ func authLogout(res http.ResponseWriter, req *http.Request) {
 	res.WriteHeader(http.StatusTemporaryRedirect)
 }
 
-func authHealth(res http.ResponseWriter, req *http.Request) {
+func authUser(res http.ResponseWriter, req *http.Request) {
 	session, err := store.Get(req, "app-session")
 	if err != nil {
 		res.WriteHeader(http.StatusInternalServerError)
@@ -95,10 +95,10 @@ func main() {
 	goth.UseProviders(google.New(os.Getenv("GOOGLE_OAUTH_CLIENT_ID"), os.Getenv("GOOGLE_OAUTH_SECRET"), "http://localhost:8080/auth/google/callback"))
 
 	router := pat.New()
-	router.Get("/auth/health", authHealth)
-	router.Get("/auth/{provider}/callback", authCallback)
-	router.Get("/auth/{provider}/logout", authLogout)
-	router.Get("/auth/{provider}", auth)
+	router.Get("/api/auth/user", authUser)
+	router.Get("/api/auth/{provider}/callback", authCallback)
+	router.Get("/api/auth/{provider}/logout", authLogout)
+	router.Get("/api/auth/{provider}", auth)
 	router.Get("/api/health", health)
 	http.Handle("/", router)
 
