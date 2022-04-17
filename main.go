@@ -30,7 +30,6 @@ func createSession(user goth.User, res http.ResponseWriter, req *http.Request) {
 		return
 	}
 	session.Values["user"] = User{Provider: user.Provider, Email: user.Email, AvatarURL: user.AvatarURL}
-	fmt.Println(session.Values["user"])
 	if err = session.Save(req, res); err != nil {
 		fmt.Fprintln(res, "Could not save session", err)
 	}
@@ -70,7 +69,6 @@ func authUser(res http.ResponseWriter, req *http.Request) {
 
 	}
 	user, _ := session.Values["user"]
-	fmt.Println(user)
 	res.WriteHeader(http.StatusOK)
 	json.NewEncoder(res).Encode(map[string]interface{}{"ok": true, "user": user})
 }
@@ -104,6 +102,6 @@ func main() {
 	router.Get("/api/health", health)
 	http.Handle("/", router)
 
-	fmt.Println("Starting webserver...")
+	log.Println("Starting webserver...")
 	http.ListenAndServe(":8080", nil)
 }
