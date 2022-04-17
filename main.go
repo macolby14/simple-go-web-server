@@ -30,9 +30,12 @@ func createSession(user goth.User, res http.ResponseWriter, req *http.Request) {
 		return
 	}
 	session.Values["user"] = User{Provider: user.Provider, Email: user.Email, Name: user.Name, AvatarURL: user.AvatarURL}
-	session.Save(req, res)
-	res.WriteHeader(http.StatusOK)
-	fmt.Fprintln(res, "Logged in successfully")
+	fmt.Println(session.Values["user"])
+	if session.Save(req, res); err != nil {
+		fmt.Fprintln(res, "Could not save session", err)
+	}
+	// res.WriteHeader(http.StatusOK)
+	// fmt.Fprintln(res, "Logged in successfully")
 }
 
 func auth(res http.ResponseWriter, req *http.Request) {
@@ -60,11 +63,16 @@ func authLogout(res http.ResponseWriter, req *http.Request) {
 }
 
 func authHealth(res http.ResponseWriter, req *http.Request) {
-	// session, _ := store.Get(req, "app-session")
-	// user, _ := session.Values["user"]
+	session, err := store.Get(req, "app-session")
+	if err != nil {
+		res.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(res).Encode(map[string]error{"error": err})
 
+	}
+	user, _ := session.Values["user"]
+	fmt.Println(user)
 	res.WriteHeader(http.StatusOK)
-	json.NewEncoder(res).Encode(map[string]bool{"ok": true})
+	json.NewEncoder(res).Encode(map[string]interface{}{"ok": true, "user": user})
 }
 
 func health(res http.ResponseWriter, req *http.Request) {
