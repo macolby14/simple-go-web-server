@@ -30,8 +30,8 @@ func createSession(user goth.User, res http.ResponseWriter, req *http.Request) {
 	}
 	session.Values["user"] = User{Provider: user.Provider, Email: user.Email, Name: user.Name, AvatarURL: user.AvatarURL}
 	session.Save(req, res)
-	res.Header().Set("Location", "/")
-	res.WriteHeader(http.StatusTemporaryRedirect)
+	res.WriteHeader(http.StatusOK)
+	fmt.Fprintln(res, "Logged in successfully")
 }
 
 func auth(res http.ResponseWriter, req *http.Request) {
@@ -45,12 +45,11 @@ func auth(res http.ResponseWriter, req *http.Request) {
 func authCallback(res http.ResponseWriter, req *http.Request) {
 	user, err := gothic.CompleteUserAuth(res, req)
 	if err != nil {
+		res.WriteHeader(http.StatusInternalServerError)
 		fmt.Fprintln(res, err)
 		return
 	}
 	createSession(user, res, req)
-	res.Header().Set("Location", "/")
-	res.WriteHeader(http.StatusTemporaryRedirect)
 }
 
 func authLogout(res http.ResponseWriter, req *http.Request) {
