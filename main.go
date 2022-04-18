@@ -4,8 +4,9 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"time"
 
-	"github.com/gorilla/pat"
+	"github.com/gorilla/mux"
 	"github.com/joho/godotenv"
 )
 
@@ -21,14 +22,22 @@ func main() {
 
 	authInit()
 
-	router := pat.New()
-	router.Get("/api/auth/user", authUser)
-	router.Get("/api/auth/{provider}/callback", authCallback)
-	router.Get("/api/auth/{provider}/logout", authLogout)
-	router.Get("/api/auth/{provider}", auth)
-	router.Get("/api/health", health)
+	router := mux.NewRouter()
+	router.HandleFunc("/api/auth/user", authUser)
+	router.HandleFunc("/api/auth/{provider}/callback", authCallback)
+	router.HandleFunc("/api/auth/{provider}/logout", authLogout)
+	router.HandleFunc("/api/auth/{provider}", auth)
+	router.HandleFunc("/api/health", health)
 	http.Handle("/", router)
 
 	log.Println("Starting webserver...")
-	http.ListenAndServe(":8080", nil)
+	srv := &http.Server{
+		Handler: router,
+		Addr:    "127.0.0.1:8080",
+		// Good practice: enforce timeouts for servers you create!
+		WriteTimeout: 15 * time.Second,
+		ReadTimeout:  15 * time.Second,
+	}
+
+	log.Fatal(srv.ListenAndServe())
 }
