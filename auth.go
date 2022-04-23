@@ -8,7 +8,6 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/gorilla/securecookie"
 	"github.com/gorilla/sessions"
 	"github.com/markbates/goth"
 	"github.com/markbates/goth/gothic"
@@ -28,8 +27,6 @@ func authInit() {
 
 	store = sessions.NewCookieStore([]byte(os.Getenv("APP_SESSION_SECRET")))
 
-	/* This is just used for gothic state */
-	os.Setenv("SESSION_SECRET", string(securecookie.GenerateRandomKey(32)))
 	goth.UseProviders(google.New(os.Getenv("GOOGLE_OAUTH_CLIENT_ID"), os.Getenv("GOOGLE_OAUTH_SECRET"), "http://localhost:8080/api/auth/google/callback"))
 }
 
