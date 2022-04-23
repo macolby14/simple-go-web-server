@@ -37,6 +37,7 @@ func main() {
 		log.Fatal("Error loading .env file")
 	}
 
+	dbInit()
 	authInit()
 
 	router := mux.NewRouter()

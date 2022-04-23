@@ -14,12 +14,6 @@ import (
 	"github.com/markbates/goth/providers/google"
 )
 
-type User struct {
-	Provider  string
-	Email     string
-	AvatarURL string
-}
-
 var store *sessions.CookieStore
 
 func authInit() {
