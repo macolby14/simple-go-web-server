@@ -26,6 +26,10 @@ func authInit() {
 }
 
 func createSession(user goth.User, res http.ResponseWriter, req *http.Request) {
+
+	appUser := getOrCreateUser(user)
+	log.Printf("Temp log. User. %v\n", appUser)
+
 	session, err := store.Get(req, "app-session")
 	if err != nil {
 		log.Printf("[ERROR] getting a session: %v\n", err)
@@ -40,8 +44,8 @@ func createSession(user goth.User, res http.ResponseWriter, req *http.Request) {
 }
 
 func auth(res http.ResponseWriter, req *http.Request) {
-	if user, err := gothic.CompleteUserAuth(res, req); err == nil {
-		createSession(user, res, req)
+	if gothUser, err := gothic.CompleteUserAuth(res, req); err == nil {
+		createSession(gothUser, res, req)
 	} else {
 		gothic.BeginAuthHandler(res, req)
 	}
