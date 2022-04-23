@@ -25,9 +25,10 @@ var store *sessions.CookieStore
 func authInit() {
 	gob.Register(User{})
 
-	store = sessions.NewCookieStore([]byte(os.Getenv("APP_SESSION_SECRET")))
+	store = sessions.NewCookieStore([]byte(os.Getenv("SESSION_SECRET")))
 
 	goth.UseProviders(google.New(os.Getenv("GOOGLE_OAUTH_CLIENT_ID"), os.Getenv("GOOGLE_OAUTH_SECRET"), "http://localhost:8080/api/auth/google/callback"))
+	gothic.Store = store
 }
 
 func createSession(user goth.User, res http.ResponseWriter, req *http.Request) {
