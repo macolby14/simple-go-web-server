@@ -3,6 +3,7 @@ package main
 import (
 	"database/sql"
 	"log"
+	"time"
 
 	"github.com/markbates/goth"
 	_ "modernc.org/sqlite"
@@ -57,7 +58,25 @@ func getOrCreateUser(gothUser goth.User) *User {
 	if found {
 		return user
 	}
-	return nil
+	user = createUser(gothUser)
+	return user
+}
+
+func createUser(gothUser goth.User) *User {
+	userQ := `
+	INSERT INTO user (email, avatarUrl, timeCreated)
+	VALUES (?, ?, ?);
+	`
+
+	_, err := db.Query(userQ, gothUser.Email, gothUser.AvatarURL, time.Now().Unix())
+	if err != nil {
+		log.Printf("[ERROR] Error with db insert. %v", err)
+	}
+
+	log.Printf("[INFO] Created user\n")
+
+	user, _ := getUser(gothUser.Email)
+	return user
 }
 
 func getUser(gothEmail string) (*User, bool) {
@@ -66,7 +85,7 @@ func getUser(gothEmail string) (*User, bool) {
 	// `
 	userQ := `
 	SELECT * FROM user WHERE email=?;
-`
+	`
 	rows, err := db.Query(userQ, gothEmail)
 	if err != nil {
 		log.Printf("[ERROR] Error with db query. %v", err)
@@ -93,7 +112,7 @@ func getUser(gothEmail string) (*User, bool) {
 	if err := rows.Scan(&id, &email, &avatarUrl, &timeCreated); err != nil {
 		log.Printf("[ERROR] Error scanning row. %v\n", err)
 	}
-	log.Printf("Results: %v %v %v %v\n", id, email, avatarUrl, timeCreated)
+	log.Printf("[INFO] Found User in DB: %v %v %v %v\n", id, email, avatarUrl, timeCreated)
 
 	return &User{Email: email, AvatarURL: avatarUrl}, true
 }
