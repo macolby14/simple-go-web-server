@@ -9,7 +9,6 @@ import (
 )
 
 type User struct {
-	Provider  string
 	Email     string
 	AvatarURL string
 }
@@ -87,16 +86,14 @@ func getUser(gothEmail string) (*User, bool) {
 
 	var (
 		id          int
-		name        string
 		email       string
 		avatarUrl   string
 		timeCreated int
 	)
-	if err := rows.Scan(&id, &name, &email, &avatarUrl, &timeCreated); err != nil {
+	if err := rows.Scan(&id, &email, &avatarUrl, &timeCreated); err != nil {
 		log.Printf("[ERROR] Error scanning row. %v\n", err)
 	}
-	log.Printf("Results: %v %v %v %v %v\n", id, name, email, avatarUrl, timeCreated)
+	log.Printf("Results: %v %v %v %v\n", id, email, avatarUrl, timeCreated)
 
-	return &User{"provider", email, avatarUrl}, true
-
+	return &User{Email: email, AvatarURL: avatarUrl}, true
 }

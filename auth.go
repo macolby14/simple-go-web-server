@@ -35,7 +35,7 @@ func createSession(user goth.User, res http.ResponseWriter, req *http.Request) {
 		log.Printf("[ERROR] getting a session: %v\n", err)
 		return
 	}
-	session.Values["user"] = User{Provider: user.Provider, Email: user.Email, AvatarURL: user.AvatarURL}
+	session.Values["user"] = User{Email: user.Email, AvatarURL: user.AvatarURL}
 	if err = session.Save(req, res); err != nil {
 		fmt.Fprintln(res, "Could not save session", err)
 	}
