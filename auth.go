@@ -25,17 +25,16 @@ func authInit() {
 	gothic.Store = store
 }
 
-func createSession(user goth.User, res http.ResponseWriter, req *http.Request) {
+func createSession(gothUser goth.User, res http.ResponseWriter, req *http.Request) {
 
-	appUser := getOrCreateUser(user)
-	log.Printf("Temp log. User. %v\n", appUser)
+	user := getOrCreateUser(gothUser)
 
 	session, err := store.Get(req, "app-session")
 	if err != nil {
 		log.Printf("[ERROR] getting a session: %v\n", err)
 		return
 	}
-	session.Values["user"] = User{Email: user.Email, AvatarURL: user.AvatarURL}
+	session.Values["user"] = user
 	if err = session.Save(req, res); err != nil {
 		fmt.Fprintln(res, "Could not save session", err)
 	}
