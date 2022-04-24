@@ -92,15 +92,9 @@ func getUser(gothEmail string) (*User, bool) {
 	}
 	defer rows.Close()
 
-	hasNext := rows.Next()
-
-	if !hasNext {
+	if !rows.Next() {
 		log.Printf("[INFO] No user account found in getUser for email. %v\n", gothEmail)
 		return nil, false
-	}
-
-	if rows.Next() {
-		log.Fatalf("[ERROR] Multiple users with same emaila ddress. %v\n", gothEmail)
 	}
 
 	var (
@@ -113,6 +107,10 @@ func getUser(gothEmail string) (*User, bool) {
 		log.Printf("[ERROR] Error scanning row. %v\n", err)
 	}
 	log.Printf("[INFO] Found User in DB: %v %v %v %v\n", id, email, avatarUrl, timeCreated)
+
+	if rows.Next() {
+		log.Fatalf("[ERROR] Multiple users with same emaila ddress. %v\n", gothEmail)
+	}
 
 	return &User{Email: email, AvatarURL: avatarUrl}, true
 }
